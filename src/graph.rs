@@ -10,10 +10,19 @@ use crate::{
 
 pub type Data = (f64, f64);
 
+// TODO embed some kind of Canvas to define the actual plot area. use this to
+// draw the axes below and also to normalize the data when plotting that
 pub struct Graph {
+    /// total width of the output image (in pixels)
     width: u32,
+
+    /// total height of the output image (in pixels)
     height: u32,
+
+    /// internal image buffer
     image: RgbImage,
+
+    /// plot data
     data: Vec<Data>,
 }
 

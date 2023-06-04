@@ -27,12 +27,7 @@ pub struct Rectangle {
 }
 
 impl Rectangle {
-    pub fn new(
-        beg: Point,
-        end: Point,
-        fill: Color,
-        stroke: Stroke,
-    ) -> Self {
+    pub fn new(beg: Point, end: Point, fill: Color, stroke: Stroke) -> Self {
         Self {
             beg,
             end,

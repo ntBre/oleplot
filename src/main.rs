@@ -1,22 +1,14 @@
 use std::error::Error;
 
-use image::RgbImage;
-use oleplot::{
-    colors::{BLACK, GREY, WHITE},
-    shapes::{Rectangle, Stroke},
-};
+use oleplot::{colors::WHITE, graph::Graph};
 
 fn main() -> Result<(), Box<dyn Error + 'static>> {
     const WIDTH: u32 = 600;
     const HEIGHT: u32 = 300;
 
-    let mut img = RgbImage::from_pixel(WIDTH, HEIGHT, WHITE);
-
-    let axes =
-        Rectangle::new((75, 38), (525, 272), GREY, Stroke::new(BLACK, 2));
-
-    axes.draw(&mut img);
-
+    let mut img = Graph::new(WIDTH, HEIGHT, WHITE);
+    img.draw();
     img.save("test.png")?;
+
     Ok(())
 }

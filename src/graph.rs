@@ -100,22 +100,7 @@ impl Graph {
     /// plot `self.data`. TODO take a shape for the markers
     pub fn plot(&mut self) {
         // TODO take x and y range from input
-        let (mut min_x, mut min_y) = self.data.first().unwrap_or(&(0.0, 0.0));
-        let (mut max_x, mut max_y) = self.data.first().unwrap_or(&(0.0, 0.0));
-        for (x, y) in &self.data {
-            if *x < min_x {
-                min_x = *x
-            }
-            if *y < min_y {
-                min_y = *y
-            }
-            if *x > max_x {
-                max_x = *x
-            }
-            if *y > max_y {
-                max_y = *y
-            }
-        }
+        let (min_x, min_y, max_x, max_y) = min_max(&self.data);
 
         let cw = self.canvas.width();
         let ch = self.canvas.height();
@@ -143,4 +128,25 @@ impl Graph {
     {
         self.image.save(path)
     }
+}
+
+/// return the min_x, min_y, max_x, and max_y coordinates in `data`
+fn min_max(data: &[Data]) -> (f64, f64, f64, f64) {
+    let (mut min_x, mut min_y) = data.first().unwrap_or(&(0.0, 0.0));
+    let (mut max_x, mut max_y) = data.first().unwrap_or(&(0.0, 0.0));
+    for (x, y) in data {
+        if *x < min_x {
+            min_x = *x
+        }
+        if *y < min_y {
+            min_y = *y
+        }
+        if *x > max_x {
+            max_x = *x
+        }
+        if *y > max_y {
+            max_y = *y
+        }
+    }
+    (min_x, min_y, max_x, max_y)
 }

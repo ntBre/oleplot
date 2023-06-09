@@ -79,6 +79,8 @@ impl Graph {
             ..
         } = *self;
 
+        // TODO take this from input. kinda makes more sense to use margins
+        // instead of fractions as input
         let ox = w / 8;
         let oy = h / 8;
 
@@ -95,6 +97,36 @@ impl Graph {
         self.canvas = Canvas::new(beg, end);
 
         axes.draw(&mut self.image);
+
+        // draw major ticks
+        let tick_num = 5;
+        let tick_len = 4;
+        self.draw_ticks(beg, end, tick_num, tick_len);
+
+        // TODO minor ticks between majors. can't just call draw_ticks again
+        // because the intervals don't quite match up. going to rework the
+        // step_by stuff
+    }
+
+    fn draw_ticks(
+        &mut self,
+        beg: (u32, u32),
+        end: (u32, u32),
+        tick_num: u32,
+        tick_len: u32,
+    ) {
+        let step = (end.0 - beg.0) / (tick_num + 1);
+        for x in (beg.0..end.0).step_by(step as usize).skip(1) {
+            for y in end.1 - tick_len..end.1 + tick_len {
+                self.image.put_pixel(x, y, BLACK);
+            }
+        }
+        let step = (end.1 - beg.1) / (tick_num + 1);
+        for y in (beg.1..end.1).rev().step_by(step as usize).skip(1) {
+            for x in beg.0 - tick_len..beg.0 + tick_len {
+                self.image.put_pixel(x, y, BLACK);
+            }
+        }
     }
 
     /// plot `self.data`. TODO take a shape for the markers

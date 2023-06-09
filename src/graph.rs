@@ -3,15 +3,39 @@ use std::path::Path;
 use image::RgbImage;
 
 use crate::{
-    colors::{BLACK, GREEN, GREY},
+    colors::{BLACK, BLUE, GREY},
     shapes::{circle::Circle, rectangle::Rectangle, Draw, Stroke},
-    Color,
+    Color, Point,
 };
 
 pub type Data = (f64, f64);
 
-// TODO embed some kind of Canvas to define the actual plot area. use this to
-// draw the axes below and also to normalize the data when plotting that
+#[derive(Debug)]
+struct Canvas {
+    beg: Point,
+    end: Point,
+}
+
+impl Canvas {
+    fn new<P>(beg: P, end: P) -> Self
+    where
+        P: Into<Point>,
+    {
+        Self {
+            beg: beg.into(),
+            end: end.into(),
+        }
+    }
+
+    fn width(&self) -> u32 {
+        self.end.x - self.beg.x
+    }
+
+    fn height(&self) -> u32 {
+        self.end.y - self.beg.y
+    }
+}
+
 pub struct Graph {
     /// total width of the output image (in pixels)
     width: u32,
@@ -21,6 +45,9 @@ pub struct Graph {
 
     /// internal image buffer
     image: RgbImage,
+
+    /// section of the image for plotting data
+    canvas: Canvas,
 
     /// plot data
     data: Vec<Data>,
@@ -40,6 +67,7 @@ impl Graph {
             height,
             image,
             data,
+            canvas: Canvas::new((0, 0), (width, height)),
         }
     }
 
@@ -51,29 +79,56 @@ impl Graph {
             ..
         } = *self;
 
-        let ox = w / 4;
-        let oy = h / 4;
+        let ox = w / 8;
+        let oy = h / 8;
 
-        let axes = Rectangle::new(
-            (ox, oy),
-            (w - ox, h - oy),
-            GREY,
-            Stroke::new(BLACK, 2),
-        );
+        let beg = (ox, oy);
+        let end = (w - ox, h - oy);
+
+        let axes =
+            Rectangle::new(beg.into(), end.into(), GREY, Stroke::new(BLACK, 2));
+
+        self.canvas = Canvas::new(beg, end);
 
         axes.draw(&mut self.image);
     }
 
     /// plot `self.data`. TODO take a shape for the markers
     pub fn plot(&mut self) {
+        // TODO take x and y range from input
+        let (mut min_x, mut min_y) = self.data.first().unwrap_or(&(0.0, 0.0));
+        let (mut max_x, mut max_y) = self.data.first().unwrap_or(&(0.0, 0.0));
         for (x, y) in &self.data {
-            // TODO normalize the coordinates of the data. might be a good idea
-            // to do this at the beginning unless we only access it once
+            if *x < min_x {
+                min_x = *x
+            }
+            if *y < min_y {
+                min_y = *y
+            }
+            if *x > max_x {
+                max_x = *x
+            }
+            if *y > max_y {
+                max_y = *y
+            }
+        }
 
-            // let x = (x / self.width as f64).round() as u32;
-            // let y = (y / self.height as f64).round() as u32;
+        let cw = self.canvas.width();
+        let ch = self.canvas.height();
 
-            let c = Circle::new((*x as u32, *y as u32), 4, GREEN);
+        let dw = max_x - min_x;
+        let dh = max_y - min_y;
+
+        for (x, y) in &self.data {
+            // normalize to drawing area
+            let mx = (cw as f64 * (x - min_x) / dw).round() as u32;
+            let my = (ch as f64 * (y - min_y) / dh).round() as u32;
+
+            // convert to screen coordinates
+            let mx = mx + self.canvas.beg.x;
+            let my = self.canvas.end.y - my;
+
+            let c = Circle::new((mx, my).into(), 4, BLUE);
             c.draw(&mut self.image);
         }
     }

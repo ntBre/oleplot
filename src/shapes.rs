@@ -10,6 +10,7 @@ pub trait Draw {
     fn draw(&self, img: &mut RgbImage);
 }
 
+#[derive(Debug)]
 pub struct Stroke {
     pub(crate) color: Color,
     pub(crate) width: u32,

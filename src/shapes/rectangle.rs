@@ -4,6 +4,7 @@ use super::Draw;
 use super::Stroke;
 use image::RgbImage;
 
+#[derive(Debug)]
 pub struct Rectangle {
     pub(crate) beg: Point,
     pub(crate) end: Point,
@@ -25,8 +26,8 @@ impl Rectangle {
 impl Draw for Rectangle {
     /// draw `self` onto `img`
     fn draw(&self, img: &mut RgbImage) {
-        let (bx, by) = self.beg;
-        let (ex, ey) = self.end;
+        let (bx, by) = self.beg.inner();
+        let (ex, ey) = self.end.inner();
 
         let sx = bx.min(ex);
         let ex = bx.max(ex);

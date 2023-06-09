@@ -3,7 +3,7 @@ use std::path::Path;
 use image::RgbImage;
 
 use crate::{
-    colors::{BLACK, BLUE, GREY},
+    colors::{BLACK, BLUE, WHITE},
     shapes::{circle::Circle, rectangle::Rectangle, Draw, Stroke},
     Color, Point,
 };
@@ -85,8 +85,12 @@ impl Graph {
         let beg = (ox, oy);
         let end = (w - ox, h - oy);
 
-        let axes =
-            Rectangle::new(beg.into(), end.into(), GREY, Stroke::new(BLACK, 2));
+        let axes = Rectangle::new(
+            beg.into(),
+            end.into(),
+            WHITE,
+            Stroke::new(BLACK, 2),
+        );
 
         self.canvas = Canvas::new(beg, end);
 
@@ -128,7 +132,7 @@ impl Graph {
             let mx = mx + self.canvas.beg.x;
             let my = self.canvas.end.y - my;
 
-            let c = Circle::new((mx, my).into(), 4, BLUE);
+            let c = Circle::new((mx, my).into(), 2, BLUE);
             c.draw(&mut self.image);
         }
     }

@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<dyn Error + 'static>> {
     const HEIGHT: u32 = 300;
 
     let mut img =
-        Graph::new(WIDTH, HEIGHT, CYAN, load_data("testfiles/x.dat")?);
+        Graph::new(WIDTH, HEIGHT, CYAN, load_data("testfiles/sin.dat")?);
     img.draw();
     img.plot();
     img.save("test.png")?;
